@@ -3,11 +3,14 @@
 #include <linux/ptp_clock_kernel.h>
 
 #define PTP_CLOCK_NAME "wyou_ptp_clock"
+bool g_wyou_enable = false;
+EXPORT_SYMBOL(g_wyou_enable);
 
 static int
 wyou_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
 {
     pr_info("wyou_ptp_settime64 called\n");
+    pr_err("g_wyou_enable=%d\n", g_wyou_enable);
     return 0;
 }
 
@@ -16,6 +19,7 @@ wyou_ptp_gettimex64(struct ptp_clock_info *info, struct timespec64 *ts,
 		   struct ptp_system_timestamp *sts)
 {
 	pr_info("wyou_ptp_gettimex64 called\n");
+    pr_err("g_wyou_enable=%d\n", g_wyou_enable);
 	return 0;
 }
 
@@ -23,13 +27,15 @@ static int
 wyou_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
 {
 	pr_info("wyou_ptp_adjtime called\n");
+    pr_err("g_wyou_enable=%d\n", g_wyou_enable);
 	return 0;
 }
 
 static int 
 wyou_ptp_adjfine(struct ptp_clock_info *info, long scaled_ppm)
 {
-	pr_info("wyou_ptp_adjfine called\n");
+    g_wyou_enable = !g_wyou_enable;
+    pr_err("g_wyou_enable=%d\n", g_wyou_enable);
 	return 0;
 }
 
@@ -57,7 +63,7 @@ static int __init wyou_ptp_clock_init(void) {
         return PTR_ERR(my_ptp_clock);
     }
 
-    pr_info("Wyou PTP clock registered successfully\n");
+    pr_info("Wyou PTP clock registered successfully with index %d\n", ptp_clock_index(my_ptp_clock));
     return 0;
 }
 
